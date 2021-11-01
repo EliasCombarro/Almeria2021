@@ -1,0 +1,1909 @@
+\documentclass{beamer}
+
+
+\mode<presentation>
+
+\graphicspath{{./figs/}}
+\usecolortheme{orchid}
+\usecolortheme{whale}
+\useinnertheme[shadow]{rounded}
+%\useoutertheme{shadow}
+%\usetheme{split}
+\useinnertheme{circles}
+%\setbeamertemplate{sections/subsections in toc}[sections numbered]
+\usepackage{physics}
+\usepackage{qcircuit}
+%\usepackage[latin1]{inputenc}
+%\usepackage[T1]{fontenc}
+
+
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks,
+  allcolors=.,
+  urlcolor=blue,
+}
+%\usepackage{subfig}
+\usepackage[spanish]{babel} % Para separar correctamente las palabras
+\usepackage[utf8]{inputenc} % Este paquete permite poner acentos y eñes usando codificación utf-8
+
+%\usepackage[latin1]{inputenc}
+%\usepackage[T1]{fontenc}
+
+\usepackage{graphicx,psfrag,subfigure}
+\usepackage{times,amsmath,amsthm,rotating}
+%\usepackage{newalg,times,amsmath,amsthm,rotating}
+\usepackage{fancyvrb,enumerate}
+
+\setbeamertemplate{page number in head/foot}[framenumber]
+%\setbeamertemplate{footline}[frame number]
+
+%gets rid of navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+
+
+%%%% theorem-like environments
+\newtheorem{definicion}{Definición}
+\newtheorem{teorema}{Teorema}
+\newtheorem{lema}{Lema}
+\newtheorem{corolario}{Corolario}
+%\newenvironment{demostracion}%
+%	{\textsc{Demostración}}%
+%	{\mbox{\rule{1ex}{1em}}}
+\newenvironment{demostracion}%
+	{\begin{proof}}%
+	{\end{proof}}
+\newtheorem{ejemplo}{Ejemplo}{}
+
+\unaccentedoperators
+
+
+%\include{psfrags}
+
+\title{\bf Una introducción práctica al quantum machine learning y a los algoritmos variacionales cuánticos}
+\author[EFC]{{\bf Elías F. Combarro (Universidad de Oviedo)}\\
+\href{mailto:efernandezca@uniovi.es}{efernandezca@uniovi.es}}
+\date{Universidad de Almería - Noviembre  2021}
+%\date{}
+
+\titlegraphic{\includegraphics[width=0.25\textwidth]{unial} \hspace{1cm} \includegraphics[width=0.35\textwidth]{uniovi}}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\part{Introducción y objetivos}
+\frame{\partpage}
+
+
+\frame{
+	\frametitle{¿Qué es la computación cuántica?}
+	%\begin{itemize}
+	\begin{block}{Computación cuántica}
+	La computación cuántica es un paradigma probabilista de computación que utiliza las propiedades de la mecánica cuántica para realizar cálculos
+	\end{block} 
+	\centering
+	\includegraphics[width=1\textwidth]{device.png}
+}	
+
+\frame{
+	\frametitle{Aplicaciones de la computación cuántica}
+	\begin{itemize}
+		\item Aceleración de tareas de búsqueda (algoritmo de Grover)
+		\item Factorización de números (algoritmo de Shor)
+		\item Resolución de sistemas de ecuaciones lineales (algoritmo HHL)
+		\item Criptografía y comunicaciones cuánticas 
+		\item Simulación de procesos químicos y físicos
+		\item Problemas de optimización
+		\item Quantum Machine Learning
+	\end{itemize}
+	\centering
+	\includegraphics[width=0.6\textwidth]{inicio}
+}
+
+\frame{
+	\frametitle{QC en los tiempos del NISQ}
+	\begin{itemize}
+	\item Noisy Intermediate-Scale Quantum computers 
+	\begin{itemize}
+		\item Afectados por el ruido 
+		\item Número de qubits limitado (50-100)
+		\item Sin conexión completa
+	\end{itemize} 
+	\item A pesar de ello, estos ordenadores podrían ser útiles en ciertas tareas
+	\end{itemize}
+		\centering
+	\includegraphics[width=0.9\textwidth]{nisq}
+}
+
+
+\frame{
+	\frametitle{Objetivos de este curso}
+	\begin{itemize}
+		\item Recordar los conceptos fundamentales de la computación cuántica
+		\item Estudiar algunos de los algoritmos principales de la era NISQ
+		\begin{itemize}
+			\item Variational Quantum Eigensolver (VQE)
+			\item Quantum Approximate Optimization Algorithm (QAOA) y Quantum Annealing
+			\item Quantum Support Vector Machines (QSVMs)
+			\item Variational Quantum Classifiers (VQCs) 
+			\item Quantum Generative Adversarial Networks (QGANs)
+		\end{itemize}
+		\item Ejecutar estos algoritmos en algunos casos sencillos
+		\begin{itemize}
+			\item En simuladores 
+			\item En ordenadores cuánticos reales
+		\end{itemize}
+	\end{itemize}
+		\centering
+	\includegraphics[width=0.7\textwidth]{dilbert.png}
+}
+
+%\end{document}
+
+\frame{
+	\frametitle{Recursos y herramientas}
+	\begin{itemize}
+		\item Jupyter Notebooks
+		\begin{itemize}
+			\item Entorno para la creación y ejecución de documentos que combinan código, texto enriquecido e imágenes
+			\item Se puede ejecutar localmente (Anaconda) o en la nube (mybinder.org, Google Colab...)
+		\end{itemize}		
+		\item IBM Quantum Experience
+		\begin{itemize}
+			\item Acceso online gratuito a simuladores (hasta 32 qubits) y {\bf ordenadores cuánticos reales} (1, 5, 7 y 15 qubits)
+			\item Diferentes topologías y lenguajes (python, qasm, Jupyter Notebooks)
+			\item Lanzado en mayo de 2016
+			\item \url{https://quantum-computing.ibm.com/}
+		\end{itemize}
+	\end{itemize}
+	
+	\centering
+	\includegraphics[width=0.4\textwidth]{composer}
+
+}
+
+\frame{
+	\frametitle{Recursos y herramientas (2)}
+	\begin{itemize}
+		\item Quirk
+		\begin{itemize}
+			\item Simulador online (hasta 16 qubits)
+			\item Gran número de puertas y opciones de visualización
+			\item \url{http://algassert.com/quirk}
+		\end{itemize}
+		\item D-Wave Leap
+		\begin{itemize}
+			\item Ocean: Librería en python para computación cuántica adiabática 
+			\item Orientada a problemas específicos (QUBO, Quantum annealing...)
+			\item Leap: Acceso a {\it quantum annealers}
+			\item \url{https://ocean.dwavesys.com/}
+		\end{itemize}
+	\end{itemize}
+	
+	\centering
+	\includegraphics[width=0.95\textwidth]{leap}
+
+}
+
+\frame{
+	\frametitle{Así es (y así suena) el IBM Q}
+	\begin{figure}%
+    \centering
+   \includegraphics[width=0.9\textwidth]{ibmq.jpg} %
+\end{figure}
+
+\centering
+\href{https://www.youtube.com/watch?v=o-FyH2A7Ed0}{The Sounds of IBM: IBM Q}
+}
+
+
+\part{Conceptos básicos de computación cuántica}
+\frame{\partpage}
+
+\frame{
+	\frametitle{Elementos de la computación cuántica}
+	\begin{itemize}
+		\item Toda computación tiene tres elementos: datos, operaciones y resultados.
+		\item En la computación cuántica, estos elementos se corresponden con los siguientes conceptos:
+		\begin{itemize}
+			\item Datos = \textbf{qubits}
+			\item Operaciones = \textbf{puertas cuánticas} (transformaciones unitarias)
+			\item Resultados = \textbf{mediciones}
+		\end{itemize} 
+		\item Todos ellos se rigen por las leyes de la mecánica cuántica, por lo que pueden ser contrarios a la intuición 
+	  \end{itemize}
+	  
+	  \centering
+	\includegraphics[width=0.6\textwidth]{qc-verde}
+
+}
+
+%\part{Sistemas de un qubit: un qubit para gobernarlos a todos}
+%\frame{\partpage}
+
+
+\frame{
+	\frametitle{Qubits}
+	\begin{itemize}
+		\item Un bit clásico es un elemento que puede tomar dos valores distintos (0 ó 1). Es discreto.
+		\item Un qubit puede ``tener'' \textbf {infinitos} valores. Es continuo. 
+		\item Los qubits viven en un {\bf espacio vectorial de Hilbert} que tiene por base dos elementos que denotamos $\ket{0}$ y $\ket{1}$.
+		\item Un qubit genérico tiene la forma de una {\bf superposición}
+		$$\ket{\psi} = \alpha \ket{0} + \beta\ket{1}$$
+		donde $\alpha$ y $\beta$ son \textbf {números complejos} que cumplen $$|\alpha|^2+|\beta|^2=1$$
+	\end{itemize}
+	
+	 \centering
+	\includegraphics[width=0.45\textwidth]{bloch}
+
+}
+
+\frame{
+	\frametitle{Pequeño recordatorio de números complejos}
+	\begin{itemize}
+		\item Un número complejo tiene la forma $$ a + bi$$
+		donde $a$ y $b$ son números reales e $i$ cumple $i^2=-1$
+		\item La suma de números complejos se define como
+		$$ (a_1 + b_1i) + (a_2 + b_2i) = (a_1+a_2) + (b_1+b_2)i$$
+		\item La multiplicación de números complejos se define como   
+		$$ (a_1 + b_1i) \cdot (a_2 + b_2i) = (a_1a_2-b_1b_2) + (a_1b_2+b_1a_2)i$$
+		\item El módulo de un número complejo es
+		$$|a+bi|=\sqrt{a^2+b^2}$$
+	\end{itemize}
+
+}
+
+\frame{
+	\frametitle{Pequeño recordatorio de números complejos (2)}
+	\begin{itemize}
+		\item El conjugado de un número complejo es $$\overline{a+bi} = a-bi$$
+		\item Se cumple que 
+			$$ (a+bi)(\overline{a+bi})=a^2+b^2=|a+bi|^2$$
+		%\item El inverso de un número complejo se puede calcular como
+		%$$ \frac{1}{a+bi} = \frac{1}{|a+bi|^2}(a-bi)$$
+		\item Fórmula de Euler:
+		$$e^{i\alpha} = cos(\alpha) + sin(\alpha) i$$
+		\item Se verifica:
+		$$e^{i\alpha}e^{i\beta} =  e^{i(\alpha+\beta)}$$
+		
+		\end{itemize}
+
+}
+
+
+
+\frame{
+	\frametitle{Medida de un qubit}
+	\begin{itemize}
+		\item La única forma de conocer el estado de un qubit es realizar una medida. Sin embargo:
+		\begin{itemize}
+			\item El resultado de la medida es aleatorio
+			\item Al medir, solo obtenemos un bit (clásico) de información
+		\end{itemize}
+		\item Si medimos el estado $\ket{\psi} = \alpha\ket{0} + \beta\ket{1}$ obtendremos $0$ con probabilidad $|\alpha|^2$ y $1$ con probabilidad $|\beta|^2$. 
+		\item Además, el nuevo estado de $\ket{\psi}$ después de realizar la medida será $\ket{0}$ o $\ket{1}$ según el resultado que se haya obtenido (colapso de la función de onda)
+		\item Es más, no podemos realizar varias medidas de $\ket{\psi}$ porque no se puede copiar el estado ({\bf teorema de no clonación}) 
+	\end{itemize}
+	 \centering \includegraphics[width=0.55\textwidth]{dilbert-2}
+
+
+}
+
+
+\frame{
+	\frametitle{La esfera de Bloch}
+	\begin{itemize}
+		\item Una forma habitual de representar el estado de un qubit es mediante la llamada esfera de Bloch
+		\item Si $\ket{\psi} = \alpha \ket{0} + \beta\ket{1}$ con $|\alpha|^2+|\beta|^2=1$ podemos encontrar ángulos $\gamma, \delta, \theta$ tales que
+		$$ \alpha = e^{i\gamma} \cos\frac{\theta}{2} $$ 
+		$$\beta = e^{i\delta} \sin\frac{\theta}{2}$$
+		\item Como las fases globales son físicamente irrelevantes, podemos reescribir
+				$$\ket{\psi} = \cos\frac{\theta}{2} \ket{0} + e^{i\varphi} \sin\frac{\theta}{2} \ket{1}$$
+		con $0 \leq \theta \leq \pi$ y $0 \leq \varphi < 2\pi$.
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{La esfera de Bloch (2)}
+	\begin{itemize}
+		\item De los ángulos en $\ket{\psi} = \cos \frac{\theta}{2} \ket{0} + e^{i\varphi} \sin\frac{\theta}{2} \ket{1}$ podemos obtener coordenadas esféricas para un punto en $\mathbb{R}^3$
+		$$ (\sin \theta \cos \varphi, \sin \theta \sin\varphi, \cos\theta)$$
+	\end{itemize}
+	\begin{figure}
+	 \centering \includegraphics[width=0.5\textwidth]{bloch2}
+	% \caption{wikipedia.org}
+	 \end{figure}
+}	
+
+\frame{
+	\frametitle{Producto escalar, notación de Dirac y esfera de Bloch}
+	\begin{itemize}
+	\item El producto escalar de dos estados $\ket{\psi_1} = \alpha_1 \ket{0} + \beta_1 \ket{1}$ and  $\ket{\psi_2} = \alpha_2 \ket{0} + \beta_2 \ket{1}$  viene dado por
+	$$\braket{\psi_1}{\psi_2} = \begin{pmatrix} \overline{\alpha_1} \ \overline{\beta_1} \end{pmatrix} \begin{pmatrix}\alpha_2 \\ \beta_2 \end{pmatrix} = 
+	\overline{\alpha_1}\alpha_2 +  \overline{\beta_1} \beta_2$$
+	\item Nótese que $\braket{0}{0} = \braket{1}{1} = 1$ and $\braket{0}{1} = \braket{1}{0} = 0$
+	\item Esto nos permite calcular del siguiente modo
+		\begin{multline*}
+		 \braket{\psi_1}{\psi_2} = \left(\overline{\alpha_1} \bra{0} + \overline{\beta_1} \bra{1}\right)\left(\alpha_2 \ket{0} + \beta_2 \ket{1}\right) \\
+		 = \overline{\alpha_1} \alpha_2 \braket{0}{0} +  \overline{\alpha_1} \beta_2 \braket{0}{1} +  \overline{\beta_1} \alpha_2 \braket{1}{0} +  \overline{\beta_1} \beta_2 \braket{1}{1} \\
+		 = \overline{\alpha_1}\alpha_2 +  \overline{\beta_1} \beta_2
+		 \end{multline*}
+	\item Puntos antipodales en la esfera de Bloch se corresponden con estados ortogonales
+	\end{itemize}
+}
+
+
+\frame{
+	\frametitle{Puertas cuánticas}
+	\begin{itemize}
+		\item Las leyes de la mecánica cuántica nos dicen que la evolución de un sistema responde a la ecuación de Schr\"odinger (si no se realiza una medida). 
+	\end{itemize}
+		 \centering \includegraphics[width=0.45\textwidth]{schrodinger}
+
+\begin{itemize}
+
+		\item En el caso de la computación cuántica, esto implica que las operaciones que se pueden realizar son transformaciones lineales que vienen dadas por matrices unitarias. Es decir, matrices $U$ de números complejos que verifican
+		$$UU^\dag=U^\dag U=I$$
+		donde $U^\dag$ es la transpuesta conjugada de U. 
+		\item Cada matriz de este tipo es una posible puerta cuántica en un circuito cuántico
+	\end{itemize}
+	
+	
+
+}	
+
+\frame{
+	\frametitle{Computación reversible}
+	\begin{itemize}
+		\item Como consecuencia, todas las operaciones tienen una inversa: \textbf{computación reversible} 
+		\item Todas las puertas tienen el mismo número de entradas que de salidas
+		\item No podemos implementar directamente operaciones como $or$, $and$, $nand$, $xor$...
+		\item Teóricamente, podríamos realizar cualquier computación sin gastar energía
+	\end{itemize}
+	
+	 \centering \includegraphics[width=0.35\textwidth]{fredkin}
+}	
+
+
+\frame{
+	\frametitle{Puertas cuánticas de un qubit}
+	\begin{itemize}
+		\item Si tenemos un solo qubit $\ket{\psi} = \alpha \ket{0} + \beta\ket{1}$, habitualmente lo representamos como un vector columna $\begin{pmatrix}\alpha \\ \beta \end{pmatrix}$
+		\item Entonces, una puerta cuántica de un qubit se corresponderá con una matriz $U=\begin{pmatrix} a & b \\ c & d\end{pmatrix}$ que verifica
+		
+		 $$\begin{pmatrix} a & b \\ c & d\end{pmatrix}\begin{pmatrix} \overline{a} & \overline{c} \\ \overline{b} & \overline{d}\end{pmatrix}=\begin{pmatrix} 1 & 0 \\ 0 & 1\end{pmatrix}$$ 
+		 siendo $\overline{a}, \overline{b}, \overline{c}, \overline{d}$ los conjugados de los números complejos $a,b,c,d$.
+	\end{itemize}
+}
+\frame{
+	\frametitle{Acción de una puerta cuántica de un qubit}
+	\begin{itemize}
+			
+	\item Un estado $\ket{\psi} = \alpha \ket{0} + \beta\ket{1}$ es transformado en 
+	$$\begin{pmatrix} a & b \\ c & d \end{pmatrix}\begin{pmatrix}\alpha \\ \beta \end{pmatrix} = \begin{pmatrix}a \alpha + b \beta \\ c\alpha + d \beta \end{pmatrix}$$
+	es decir, en el estado  $\ket{\psi} = (a \alpha + b \beta) \ket{0} + (c\alpha + d \beta) \ket{1}$
+	\item Como $U$ es unitaria, se cumple que $$|(a \alpha + b \beta)|^2 + |(c\alpha + d \beta)|^2=1$$
+\end{itemize}
+}
+
+\frame{
+	\frametitle{La puerta $X$ o $NOT$}
+	\begin{itemize}
+		\item La puerta $X$ viene definida por la matriz (unitaria)
+		$$\begin{pmatrix} 0 & 1 \\ 1 & 0\end{pmatrix}$$
+		\item Su acción es (notación del modelo de circuitos)
+	\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\ket{0}} & \gate{X} & \rstick{\ket{1}} \qw 
+}
+\]		
+
+
+
+		\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\ket{1}} & \gate{X} & \rstick{\ket{0}} \qw 
+}
+\]		
+ es decir, actúa como un $NOT$
+		\item Su acción sobre un qubit general sería
+		\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\alpha\ket{0}+\beta\ket{1}} & \gate{X} & \rstick{\beta\ket{0}+\alpha\ket{1}} \qw 
+}
+\]		
+		
+	\end{itemize}
+
+}	
+
+\frame{
+	\frametitle{La puerta $H$}
+	\begin{itemize}
+		\item La puerta $H$ o puerta de Hadamard viene definida por la matriz (unitaria)
+		$$\frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ 1 & -1\end{pmatrix}$$
+
+\item Su acción es
+	\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\ket{0}} & \gate{H} & \rstick{\frac{\ket{0}+\ket{1}}{\sqrt{2}}} \qw 
+}
+\]		
+
+\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\ket{1}} & \gate{H} & \rstick{\frac{\ket{0}-\ket{1}}{\sqrt{2}}} \qw 
+}
+\]		
+	\item Se suele denotar $$\ket{+}:=\frac{\ket{0}+\ket{1}}{\sqrt{2}}$$ y $$\ket{-}:=\frac{\ket{0}-\ket{1}}{\sqrt{2}}$$
+
+	\end{itemize}
+
+}	
+
+\frame{
+	\frametitle{La puerta $Z$}
+	\begin{itemize}
+		\item La puerta $Z$ viene definida por la matriz (unitaria)
+		$$\begin{pmatrix} 1 & 0 \\ 0 & -1\end{pmatrix}$$
+		\item Su acción es
+	\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\ket{0}} & \gate{Z} & \rstick{\ket{0}} \qw 
+}
+\]		
+
+		\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\ket{1}} & \gate{Z} & \rstick{-\ket{1}} \qw 
+}
+\]		
+		
+	\end{itemize}
+
+}	
+
+
+
+
+\frame{
+	\frametitle{Otras puertas}
+	\begin{itemize}
+		\item Puerta $Y$ 
+		$$\begin{pmatrix} 0 & -i \\ i & 0\end{pmatrix}$$
+		\item Puerta $T$ 
+		$$\begin{pmatrix} 1 & 0 \\ 0 & e^{i\frac{\pi}{4}}\end{pmatrix}$$
+		\item Puerta $S$ 
+		$$\begin{pmatrix} 1 & 0 \\ 0 & e^{i\frac{\pi}{2}}\end{pmatrix}$$
+		\item La puerta $R(\alpha)$ o puerta de fase, que depende de un parámetro (el ángulo $\alpha$) 
+		$$\begin{pmatrix} 1 & 0 \\ 0 & e^{i\alpha}\end{pmatrix}$$
+	\end{itemize}
+
+}
+
+
+\frame{
+	\frametitle{Puertas de rotación}
+	\begin{itemize}
+		\item Podemos definir las siguientes puertas de rotación
+		$$R_X(\theta) = e^{-i\frac{\theta}{2}X} = \cos \frac{\theta}{2} I - i \sin\frac{\theta}{2} X  =  \begin{pmatrix} \cos \frac{\theta}{2} & - i \sin\frac{\theta}{2} \\ - i \sin\frac{\theta}{2} & \cos \frac{\theta}{2}\end{pmatrix} $$
+$$R_Y(\theta) = e^{-i\frac{\theta}{2}Y} = \cos \frac{\theta}{2} I - i \sin\frac{\theta}{2} Y  = \begin{pmatrix} \cos \frac{\theta}{2} & -  \sin\frac{\theta}{2} \\  \sin\frac{\theta}{2} & \cos \frac{\theta}{2}\end{pmatrix} $$
+
+		$$R_Z(\theta) = e^{-i\frac{\theta}{2}Z} = \cos \frac{\theta}{2} I - i \sin\frac{\theta}{2} Z  =  \begin{pmatrix} e^{-i\frac{\theta}{2}} & 0 \\ 0 & e^{i\frac{\theta}{2}}\end{pmatrix} \equiv \begin{pmatrix} 1 & 0 \\ 0 & e^{i\theta}\end{pmatrix}$$
+\item Se cumple que $R_X(\pi)\equiv X$, $R_Y(\pi)\equiv Y$, $R_Z(\pi)\equiv Z$, $R_Z(\frac{\pi}{2})\equiv S$, $R_Z(\frac{\pi}{4})\equiv T$  
+	\end{itemize}
+}
+
+
+\frame{
+	\frametitle{Usando las puertas de rotación para generar puertas de un qubit}
+	\begin{itemize}
+	
+	\item Para cada puerta $U$ de un qubit, existe un vector $r=(r_x,r_y,r_z)$ de longitud 1 y un ángulo $\theta$ tal que 
+	$$ U \equiv e^{-i\frac{\theta}{2}r\cdot \sigma} = \cos \frac{\theta}{2} I - i \sin\frac{\theta}{2} (r_xX+r_yY+r_zZ)$$
+	\item Por ejemplo, eligiendo $\theta = \pi$ y $r=(\frac{1}{\sqrt{2}},0,\frac{1}{\sqrt{2}})$ se puede ver que 
+		$$ H \equiv e^{-i\frac{\theta}{2}r\cdot \sigma} = -i \frac{1}{\sqrt{2}} (X + Z) $$
+	\item Además, se puede demostrar que existen ángulos $\alpha$, $\beta$ y $\gamma$ tales que 
+		$$U\equiv R_Z(\alpha)R_Y(\beta)R_Z(\gamma)$$ 
+	\end{itemize}
+		  
+}
+
+
+\frame{
+	\frametitle{Trabajando con dos qubits}
+	\begin{itemize}
+		\item Cada qubit puede estar en los estados $\ket{0}$ y $\ket{1}$		\item Así que para dos qubits tenemos cuatro posibilidades:
+				$$\ket{0}\otimes\ket{0},\ket{0}\otimes\ket{1},\ket{1}\otimes\ket{0},\ket{1}\otimes\ket{1}$$
+				que también se denotan
+				$$\ket{0}\ket{0},\ket{0}\ket{1},\ket{1}\ket{0},\ket{1}\ket{1}$$
+				o
+				$$\ket{00},\ket{01},\ket{10},\ket{11}$$
+		\item Como podemos tener superposiciones, un estado genérico del sistema será			
+				$$\ket{\psi}=\alpha_{00} \ket{00} + \alpha_{01}\ket{01}+ \alpha_{10}\ket{10}+ \alpha_{11}\ket{11}$$
+		donde los $\alpha_{xy}$ son números complejos que cumplen $$\sum_{x,y=0}^{1}|\alpha_{xy}|^2=1$$
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Medida de un estado de dos qubits}
+	\begin{itemize}
+		\item Tenemos un estado $$\ket{\psi}=\alpha_{00} \ket{00} + \alpha_{01}\ket{01}+ \alpha_{10}\ket{10}+ \alpha_{11}\ket{11}$$
+		\item Si medimos ambos qubits, obtendremos:
+		\begin{itemize}
+			\item $00$ con probabilidad $|\alpha_{00}|^2$ y el nuevo estado será $\ket{00}$
+			\item $01$ con probabilidad $|\alpha_{01}|^2$ y el nuevo estado será $\ket{01}$
+			\item $10$ con probabilidad $|\alpha_{10}|^2$ y el nuevo estado será $\ket{10}$
+			\item $11$ con probabilidad $|\alpha_{11}|^2$ y el nuevo estado será $\ket{11}$
+
+		\end{itemize}
+		\item Es una situación análoga a la que teníamos con un solo qubit, pero ahora con cuatro posibilidades
+
+	\end{itemize}
+
+}
+
+
+\frame{
+	\frametitle{Medida de un qubit en un estado de dos qubits}
+	\begin{itemize}
+		\item Sobre un estado $$\ket{\psi}=\alpha_{00} \ket{00} + \alpha_{01}\ket{01}+ \alpha_{10}\ket{10}+ \alpha_{11}\ket{11}$$
+		también podemos medir solo un qubit
+		\item Si medimos el primer qubit (el segundo es análogo):
+		\begin{itemize}
+			\item Obtendremos $0$ con probabilidad $|\alpha_{00}|^2+|\alpha_{01}|^2$
+			\item En ese caso, el nuevo estado de $\ket{\psi}$ será $$\frac{\alpha_{00} \ket{00} + \alpha_{01}\ket{01}}{\sqrt{|\alpha_{00}|^2+|\alpha_{01}|^2}}$$
+			\item Obtendremos $1$ con probabilidad $|\alpha_{10}|^2+|\alpha_{11}|^2$
+			\item En ese caso, el nuevo estado de $\ket{\psi}$ será $$\frac{\alpha_{10} \ket{10} + \alpha_{11}\ket{11}}{\sqrt{|\alpha_{10}|^2+|\alpha_{11}|^2}}$$
+
+		\end{itemize}
+
+	\end{itemize}
+
+}
+
+\frame{
+	\frametitle{Puertas cuánticas de dos qubits}
+	\begin{itemize}
+		\item Un estado de dos qubits es $$\ket{\psi}=\alpha_{00} \ket{00} + \alpha_{01}\ket{01}+ \alpha_{10}\ket{10}+ \alpha_{11}\ket{11}$$
+		\item Se representa mediante el vector columna
+		$$\begin{pmatrix}\alpha_{00} \\ \alpha_{01} \\ \alpha_{10} \\ \alpha_{11} \end{pmatrix}$$
+		\item Podemos calcular productos escalares teniendo en cuenta que
+		$$\braket{00}{00} = \braket{01}{01} = \braket{10}{10} = \braket{11}{11} = 1$$
+		$$\braket{00}{01} = \braket{00}{10} = \braket{00}{11} = \cdots = \braket{11}{00} = 0$$
+		\item Una puerta cuántica de dos qubits es una matriz unitaria $U$ de tamaño $4\times 4$
+		\end{itemize}
+}
+
+\frame{
+	\frametitle{Productos tensoriales de puertas de un qubit}
+	\begin{itemize}
+		\item Podemos obtener una puerta de dos qubits es hacer actuar dos puertas de un qubit, $A$ y $B$, simultáneamente sobre cada uno de ellos
+		\item En este caso, la matriz de la puerta de dos qubits es el producto tensorial $A\otimes B$
+		\item Se verifica que
+		$$ (A\otimes B) (\ket{\psi_1} \otimes \ket{\psi_2}) = (A\ket{\psi_1})\otimes(B\ket{\psi_2})$$
+		\item Por supuesto, $A$ o $B$ podrían ser la identidad
+		\item NO todas las puertas de dos qubits son productos tensoriales de puertas de un qubit
+	\end{itemize}
+	\begin{figure}
+	\centering
+	\includegraphics[width=1.05\textwidth]{tensor}
+	%\caption{wikipedia.org}
+	\end{figure}
+} 
+
+
+\frame{
+	\frametitle{La puerta $CNOT$}
+	\begin{itemize}
+		\item La puerta $CNOT$ (controlled-NOT) viene definida por la matriz (unitaria)
+		$$\begin{pmatrix} 1 & 0 & 0 & 0\\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0\end{pmatrix}$$
+		\item Si el primer qubit es $\ket{0}$, no se hace nada. Si es $\ket{1}$, se invierte el segundo qubit (y el primero queda igual)
+		\item Es decir: 
+		$$\ket{00}\rightarrow \ket{00} \hspace{2em} \ket{01}\rightarrow \ket{01} $$ 
+		$$\ket{10}\rightarrow \ket{11} \hspace{2em} \ket{11}\rightarrow \ket{10} $$
+		
+	\end{itemize}
+
+}
+
+\frame{
+	\frametitle{La puerta $CNOT$}
+	\begin{itemize}
+		\item Su acción con elementos $x,y\in \{0,1\}$ es, por tanto:
+		\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\ket{x}}& \ctrl{1} & \rstick{\ket{x}} \qw \\
+\lstick{\ket{y}} & \targ & \rstick{\ket{y\oplus x}} \qw 
+}
+\]	
+		 \item Es una puerta muy importante, puesto que nos permite:
+	 	\begin{itemize} 
+	 		\item Realizar entrelazamientos 
+	 		\item Copiar información clásica, ya que:
+				$$\ket{00}\rightarrow \ket{00} $$ 
+				$$\ket{10}\rightarrow \ket{11} $$
+		\end{itemize}
+		
+	 	
+		
+	\end{itemize}
+
+}
+
+
+\frame{
+	\frametitle{Sistemas de $n$ qubits}
+	\begin{itemize}
+		\item Cada uno de los $n$ qubits puede estar en los estados $\ket{0}$ y $\ket{1}$		
+		\item Así que para el conjunto de los $n$ qubits tenemos $2^n$ posibilidades:
+				$$\ket{00\ldots0},\ket{00\ldots1},\ldots,\ket{11\ldots1}$$
+				o simplemente
+				$$\ket{0},\ket{1},\ldots,\ket{2^{n}-1}$$
+		\item Un estado genérico del sistema será			
+				$$\ket{\psi}=\alpha_{0} \ket{0} + \alpha_{1}\ket{1}+ \ldots+ \alpha_{2^n-1}\ket{2^n-1}$$
+		donde los $\alpha_{i}$ son números complejos que cumplen $$\sum_{i=0}^{2^n-1}|\alpha_{i}|^2=1$$
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Medida de un estado de $n$ qubits}
+	\begin{itemize}
+		\item Supongamos que tenemos un estado genérico de $n$ qubits
+		$$\ket{\psi}=\alpha_{0} \ket{0} + \alpha_{1}\ket{1}+ \ldots+ \alpha_{2^n-1}\ket{2^n-1}$$
+		\item Si medimos todos los qubits, obtendremos:
+		\begin{itemize}
+			\item $0$ con probabilidad $|\alpha_{0}|^2$ y el nuevo estado será $\ket{0\ldots 00}$
+			\item  $1$ con probabilidad $|\alpha_{1}|^2$ y el nuevo estado será $\ket{0\ldots 01}$
+			\item $\ldots$
+			\item  $2^{n}-1$ con probabilidad $|\alpha_{2^n-1}|^2$ y el nuevo estado será $\ket{1\ldots 11}$
+
+		\end{itemize}
+		\item Es una situación análoga a la que teníamos con un solo qubit, pero ahora con $2^n$ posibilidades
+
+	\end{itemize}
+
+}
+
+
+
+\frame{
+	\frametitle{Medida de un qubit en un estado de $n$ qubits}
+	\begin{itemize}
+		\item Tenemos un estado $$\ket{\psi}=\alpha_{0} \ket{0} + \alpha_{1}\ket{1}+ \ldots+ \alpha_{2^n-1}\ket{2^n-1}$$
+		\item Si medimos el qubit $j$-ésimo
+		\begin{itemize}
+			\item Obtendremos $0$ con probabilidad $$\sum_{i\in I_0}|\alpha_{i}|^2$$ donde $I_0$ es el conjunto de números $i$ cuyo $j$-ésimo bit es $0$
+			\item En ese caso, el nuevo estado de $\ket{\psi}$ será $$\frac{\sum_{i\in I_0}\alpha_{i}\ket{i}}{\sqrt{\sum_{i\in I_0}|\alpha_{i}|^2}}$$
+			\item El caso en el que se obtiene $1$ es análogo
+
+		\end{itemize}
+
+	\end{itemize}
+
+}
+
+\frame{
+	\frametitle{Puertas cuánticas de $n$ qubits}
+	\begin{itemize}
+		\item Un estado de $n$ qubits es $$\ket{\psi}=\alpha_{0} \ket{0} + \alpha_{1}\ket{1}+ \ldots+ \alpha_{2^n-1}\ket{2^n-1}$$
+		\item Se representa mediante el vector columna
+		$$\begin{pmatrix}\alpha_{0} \\ \alpha_{1} \\ \alpha_{2} \\ \vdots \\ \alpha_{2^n-1} \end{pmatrix}$$
+		\item Para calcular productos escalares en notación de Dirac basta notar que
+				$$\braket{i}{j} = \delta_{ij}$$
+		\item Una puerta cuántica de dos qubits es una matriz unitaria $U$ de tamaño $2^n\times 2^n$
+		\end{itemize}
+}
+
+
+
+\frame{
+	\frametitle{Puertas universales en la computación cuántica}
+	\begin{itemize}
+		\item El número de puertas cuánticas (incluso para un solo qubit) es infinito no numerable. Por tanto, ningún conjunto finito de puertas es universal en el sentido tradicional del término
+		\item Lo que sí se puede conseguir son familias de puertas que \textbf{aproximan} cualquier puerta cuántica tanto como queramos 
+		\begin{teorema} Las puertas $X$, $H$, $T$ y $CNOT$ son universales para la computación cuántica
+		
+		\end{teorema}
+		\item Y podemos tener conjuntos de puertas infinitos en uno y dos qubits que son universales
+		\begin{teorema} Las puertas de rotación de un qubit junto con la puerta $CNOT$ son universales para la computación cuántica
+		
+		\end{teorema}
+				
+	\end{itemize}
+
+}
+
+\part{Optimización en ordenadores cuánticos: Quantum Annealing}
+\frame{\partpage}
+
+\frame{
+	\frametitle{El problema del corte máximo}
+	\begin{itemize}
+		\item Consideremos el problema de dividir los vértices de un grafo en dos grupos maximizando los ejes cortados
+		\begin{center}
+		\includegraphics[width=0.6\textwidth]{max-cut}
+		\end{center}
+		\item Es un problema NP-hard (si podemos resolverlo en tiempo polinomial, también podemos resolver en tiempo polinomial cualquier otro problema que esté en NP)
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Planteando el problema del corte máximo con {\it spins}}
+	\begin{itemize}
+		\item Identificamos cada vértice $i$ del grafo con una variable $Z_i$ que puede tomar valor 1 o -1
+		\item Asignamos valor 1 a los vértices de un grupo y -1 a los del otro
+		\item Entonces, si $E$ es el conjunto de ejes, el problema se puede plantear como
+		$$ \hbox{Minimizar} \sum_{(i,j)\in E} Z_iZ_j$$
+		ya que vértices en distintos grupos aportan -1 a la suma y vértices del mismo grupo aportan 1 
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Ejemplo de corte máximo}
+	\begin{itemize}
+		\item Para el grafo de la figura se trata de minimizar
+		$$ H =  Z_1Z_2 + Z_1Z_3 $$
+		\begin{center}
+		\includegraphics[width=0.25\textwidth]{grafo}
+		\end{center}
+		\item Por inspección (o enumerando todas las posibilidades) se ve que las soluciones óptimas son $011$ y $100$
+	\end{itemize}	
+}	
+
+\frame{
+	\frametitle{¿Y dónde metemos la computación cuántica en todo esto?}
+	\begin{itemize}
+		\item Recordemos que la puerta $Z$ tiene como matriz
+			$$\begin{pmatrix} 1 & 0 \\ 0 & -1\end{pmatrix}$$
+		y que el vector $\ket{0}$ tiene como coordenadas
+			$$\begin{pmatrix} 1  \\ 0 \end{pmatrix}$$
+		\item Entonces
+			$$\begin{pmatrix} 1  & 0 \end{pmatrix} \begin{pmatrix} 1 & 0 \\ 0 & -1\end{pmatrix} \begin{pmatrix} 1  \\ 0 \end{pmatrix} = 1$$
+		\item Podemos ver el anterior producto de matrices y vectores como
+				$$ \bra{0}Z\ket{0} = 1$$
+	\end{itemize} 
+	
+	}
+
+\frame{
+	\frametitle{¿Y dónde metemos la computación cuántica en todo esto?}
+	\begin{itemize}
+		\item Análogamente 
+			$$\ket{1} = \begin{pmatrix} 0  \\ 1 \end{pmatrix}$$
+		\item Así que
+			$$\bra{1}Z\ket{1} = \begin{pmatrix} 0  & 1 \end{pmatrix} \begin{pmatrix} 1 & 0 \\ 0 & -1\end{pmatrix} \begin{pmatrix} 0  \\ 1 \end{pmatrix} = -1$$
+		\item Si tenemos más qubits, podemos utilizar productos tensoriales. Por ejemplo, denotando $Z_1Z_2 = Z_1\otimes Z_2$, tenemos
+			$$ \bra{01}Z_1 Z_2\ket{01} = (\bra{0}Z_1\ket{0})\cdot(\bra{1}Z_2\ket{1}) = 1\cdot (-1) = -1$$
+			y, denotando $Z_1Z_3 = Z_1\otimes Z_3$, tenemos
+			$$ \bra{101}Z_1 Z_3\ket{101} = (\bra{1}Z_1\ket{1})\cdot(\bra{1}Z_3\ket{1}) = (-1)\cdot (-1) = 1$$
+	\end{itemize} 
+	
+	}
+	
+\frame{
+	\frametitle{Volviendo al ejemplo de corte máximo}
+	\begin{itemize}
+		\item Teníamos el problema de corte representado por
+		$$ H =  Z_1Z_2 + Z_1Z_3 $$
+		%donde, por sencillez, prescindimos del símbolo $\otimes$. 
+		\item Podemos identificar un posible corte con $\ket{011}$ (tomar los vértices 2 y 3 y dejar fuera el 1) y evaluar su coste mediante
+		\begin{multline*} \bra{011}H\ket{011} = \bra{011}(Z_1Z_2 + Z_1Z_3)\ket{011} \\
+		=  \bra{011}Z_1Z_2\ket{011} + \bra{011}(Z_1Z_3)\ket{011} = -1 + (-1) = -2
+		\end{multline*} 
+		\item Del mismo modo
+		\begin{multline*} \bra{010}H\ket{010} = \bra{010}(Z_1Z_2 + Z_1Z_3)\ket{010} \\
+		=  \bra{010}Z_1Z_2\ket{010} + \bra{010}(Z_1Z_3)\ket{010} = -1 + 1 = 0
+		\end{multline*} 
+
+		\end{itemize}	
+}	
+
+
+
+\frame{
+	\frametitle{El maravilloso mundo de los hamiltonianos}
+	\begin{itemize}
+		\item Entonces, lo que nos interesa es hallar un estado cuántico $\ket{x}$ de forma que
+		$$ \bra{x}H\ket{x}$$
+		sea mínimo, con $H=\sum_{(i,j)\in E} Z_iZ_j$ la función de coste del problema del corte máximo 
+		\item Se trata de un caso particular de un problema muy importante en física: hallar el estado de energía mínima ({\bf ground state}) de un hamiltoniano
+		\item Un hamiltoniano es una matriz $H$ hermitiana ($H = H^\dagger$)
+		\item Físicamente, puede representar fuerzas, potenciales... en la ecuación de Schrödinger
+		\item La energía de un estado $\ket{\psi}$ es 
+		$$\mel{\psi}{H}{\psi}$$
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Ejemplo: el modelo de Ising}
+	\begin{itemize}
+		\item Se tienen $n$ partículas con spin, que interactúan entre sí con ciertas fuerzas de acoplamiento
+		\item Su hamiltoniano es  	
+		$$ H = \sum_{1\leq i<j\leq n} J_{ij} Z_i Z_j + \sum_{i=1}^n h_iZ_i$$
+		con $J_{ij}$ y $h_i$ coeficientes reales 
+		\item Queremos encontrar una asignación de valores de spins (1 o -1) que minimice la suma
+		\item El problema general es NP-hard 
+	\end{itemize}
+	\centering	
+	\includegraphics[width=0.4\textwidth]{ising}
+
+}
+
+
+
+
+\frame{
+	\frametitle{Computación cuántica adiabática}
+	\begin{itemize}
+		\item ¿Cómo obtener el {\it ground state} de $H$?
+		\item Una solución natural es aplicar el propio hamiltoniano $H$ para llegar a la solución
+		\item El {\bf teorema adiabático} nos asegura que si comenzamos en el estado de mínima energía de un hamiltoniano y lo vamos variando lentamente, nos mantendremos siempre en el estado de mínima energía
+		\item La idea de la computación cuántica adiabática es:
+		\begin{itemize}
+		 	\item Comenzar en el estado de mínima energía de un hamiltoniano sencillo $H_i$
+			\item Evolucionar el sistema hacia el estado de mínima energía del hamiltoniano del problema $H_f$
+			\item Para ello se aplica el hamiltoniano dependiente del tiempo $$H(t) = (1-\frac{t}{T})H_i +\frac{t}{T}H_f$$ durante tiempo $T$
+		\end{itemize}
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Computación cuántica adiabática (2)}
+	\begin{itemize}
+		\item Para garantizar la adiabaticidad, $T$ debe crecer como el inverso del cuadrado del {\it spectral gap} de H(t)  (diferencia entre el primer y segundo nivel de energía)
+		\item El spectral gap es {\bf difícil} de calcular
+		\item En la práctica, se usa el {\it quantum annealing}: 
+		\begin{itemize}
+			\item Se toma $H_i = -\sum_{i=1}^n X_i$ (con ground state $\sum_{x=0}^{2^n-1}\ket{x}$)
+			\item Como $H_f$ se toma un hamiltoniano de Ising
+			\item Se deja evolucionar durante un tiempo $T$ (no necesariamente adiabático)
+			\item Se mide para obtener una solución
+			\item Se repite un cierto número de veces y se devuelve la mejor solución obtenida
+		\end{itemize}
+		\item Es la base de los ordenadores cuánticos de D-Wave	
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Los ordenadores cuánticos de D-Wave}
+	\begin{itemize}
+		\item Son ordenadores de propósito específico: resolver el modelo de Ising
+		\item Accesibles gratuitamente (1 minuto/mes) a través de \url{https://www.dwavesys.com/take-leap}
+	\end{itemize}
+	\centering	
+	\includegraphics[width=0.6\textwidth]{dwave}
+} 
+
+\part{Optimización en ordenadores cuánticos: QUBO y otros problemas}
+\frame{\partpage}
+
+\frame{
+	\frametitle{El problema del particionado de números}
+		\begin{itemize}
+			\item Tenemos una lista de números $\left(s_1, s_2, \ldots, s_n\right)$
+			\item Queremos encontrar una partición de la lista en dos conjuntos de suma tan parecida como sea posible
+			\item Es un problema NP-duro (aunque en casos prácticos se suele poder resolver eficientemente)
+			\item Usamos variables $Z_i$ que indican si el elemento $i$-ésimo pertenece a un conjunto (1) o al otro (-1)
+			\item Podemos formular el problema como  
+			$$ \hbox{Minimizar } \left(\sum_{i=1}^n s_iZ_i\right)^2$$
+			y expander y simplificar teniendo en cuenta que $Z_i^2 = 1$.
+		\end{itemize}
+}
+
+\frame{
+	\frametitle{Un ejemplo de particionado de números}
+		\begin{itemize}
+			\item Consideramos la lista $(2,5,4,7)$
+			\item Queremos minimizar
+			$$ \left(2Z_1 + 5Z_2 + 4Z_3 + 7Z_4 \right)^2$$
+			es decir
+			\begin{multline*}
+			4 Z_{1}^{2} + 20 Z_{1} Z_{2} + 16 Z_{1} Z_{3} + 28 Z_{1} Z_{4} + 25 Z_{2}^{2} \\
+			+ 40 Z_{2} Z_{3} + 70 Z_{2} Z_{4} + 16 Z_{3}^{2} + 56 Z_{3} Z_{4} + 49 Z_{4}^{2}
+			\end{multline*}
+			\item Es equivalente a minimizar
+			\begin{multline*}
+			 20 Z_{1} Z_{2} + 16 Z_{1} Z_{3} + 28 Z_{1} Z_{4} 
+			+ 40 Z_{2} Z_{3} + 70 Z_{2} Z_{4} +  56 Z_{3} Z_{4} 
+			\end{multline*}
+		\end{itemize}
+}
+
+\frame{
+	\frametitle{QUBO: Quadratic Unconstrained Binary Optimization}
+	\begin{itemize}
+		%\item Una formulación alternativa del modelo de Ising son los problemas QUBO (Quadratic Unconstrained Binary Optimization)
+		\item Los problemas QUBO se plantean como 
+		$$ \hbox{Minimizar} \sum_{1\leq i \leq j \leq n}^n w_{ij}x_ix_j$$
+		donde cada $x_i$ es una variable binaria y los $w_{ij}$ son coeficientes reales
+		\item También se puede plantear como minimizar
+		$$ x^TQx$$
+		con $x$ el vector columna de elementos $(x_i)$, $Q$ una matriz simétrica tal que $Q_{ij} = Q_{ji} = \frac{1}{2} w_{ij}$ y $Q_{ii} = w_{ii}$ 
+		\item Se puede reescribir como un modelo de Ising con la transformación
+		$$x_i = \frac{1- Z_i}{2}$$	
+		y volver a QUBO con
+		$$Z_i = 1-2x_i$$  
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Ejemplo: De QUBO a Ising}
+	\begin{itemize}
+		\item Consideramos el problema de minimizar 
+		$$ 3x_1^2 - 4x_1x_2 + 4x_2^2$$	
+		con $x_1$ y $x_2$ variables binarias
+		\item Hacemos el cambio 
+		$$ x_1 = \frac{1- Z_1}{2}$$
+		$$ x_2 = \frac{1- Z_2}{2}$$  
+		\item Obtenemos
+		$$\frac{3 Z_{1}^{2}}{4} - Z_{1} Z_{2} - \frac{Z_{1}}{2} + Z_{2}^{2} - Z_{2} + \frac{3}{4}$$
+		\item Es equivalente a minimizar 
+		$$ - Z_{1} Z_{2} - \frac{Z_{1}}{2}  - Z_{2} $$
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Problemas enteros con restricciones lineales}
+	\begin{itemize}
+	\item Las restricciones se añaden como penalizaciones en la función a minimizar
+	\item Una restricción de igualdad 
+	$$ \sum_{i=1}^n a_i x_i = b$$
+	se añade como el término de penalización
+	$$ M \left(\sum_{i=1}^n a_i x_i - b\right)^2$$
+	donde $M$ es una constante suficientemente grande
+	\item Podemos aprovechar que $x_i^2$ para simplificar
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Problemas enteros con restricciones lineales (2)}
+	\begin{itemize}
+	%\item Las restricciones se añaden como penalizaciones en la función a minimizar
+	\item Una restricción de desigualdad 
+	$$ \sum_{i=1}^n a_i x_i \leq b$$
+	se transforma en una de igualdad añadiendo una variable de holgura entera $c\geq 0$
+	$$ \sum_{i=1}^n a_i x_i + c = b$$
+	%donde $M$ es una constante suficientemente grande
+	\item Posteriormente, $c$ (y las variables $x_i$, si son enteras) se transforma de acuerdo a 
+	$$ c = \sum_{k=0}^m c_k 2^k$$
+	donde $c_i$ son variables binarias y $m$ es suficientemente grande para poder expresar todos los valores válidos de $c$ 
+	(el último valor podría ser menor que $2^m$ si hiciera falta)
+	
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Ejemplo: De problema con restricciones lineales a QUBO}
+	\begin{itemize}
+	\item Minimizar 
+	$$ 2xy - y - 4zy$$
+	sujeto a 
+	$$0 \leq x,y,z \leq 1$$
+	$$ x + 2y + 3z \leq 5$$
+	\item Añadimos $0\leq c \leq 5 $ y reescribimos
+	$$ x + 2y + 3z + c = 5$$
+	\item Sustituimos $ c = c_0 + 2 c_1 + 2 c_2$ e incorporamos la penalización. Ahora queremos minimizar
+	$$ 2xy - y - 4zy + 100\left(x + 2y + 3z + c_0 + 2 c_0 + 2 c_1 -5\right)^2$$
+	que es un problema QUBO (hemos elegido $M=100$).
+	\item También podríamos haber usado $ c = c_0 + 2 c_1 + 4 c_2$
+	\end{itemize}
+} 
+
+\frame{
+	\frametitle{Ejercicios}
+	\begin{itemize}
+	\item Formular usando QUBO los siguientes problemas:
+	\begin{enumerate}
+		\item {\bf Problema de la mochila}: Tenemos $n$ objetos de pesos $p_i\geq 0$ y valores $v_i\geq 0$. Elegir un conjunto de objetos de valor total máximo sin sobrepasar un peso $P$ dado. 
+		\item {\bf Problema del viajante de comercio}: Tenemos $n$ ciudades con distancias $d_{ij}\geq 0$. Encontrar un recorrido de todas las ciudades que minimice la distancia recorrida. 
+		\item {\bf Coloreado de un grafo}: Dado un grafo, determinar si con $k$ colores podemos asignar colores diferentes a todos los vértices adyacentes del grafo	\end{enumerate}
+	\end{itemize}
+	\centering
+	\includegraphics[width=0.6\textwidth]{chromatic}
+
+}  
+
+\frame{
+	\frametitle{Quantum Annealing y Machine Learning (1)}
+	\includegraphics[width=.9\textwidth]{qaml} }
+
+\frame{
+	\frametitle{Quantum Annealing y Machine Learning (2)}
+	 \includegraphics[width=\textwidth]{qubo-ml}
+}
+
+\frame{
+	\frametitle{La formulación del problema es importante}
+ 	\includegraphics[width=\textwidth]{formulacion}
+}
+
+
+\part{Optimización en ordenadores cuánticos: QAOA}
+\frame{\partpage}
+
+\frame{
+	\frametitle{Quantum Approximate Optimization Algorithm}
+	\begin{itemize}
+		\item El Quantum Approximate Optimization Algorithm (QAOA) fue propuesto por Farhi, Goldstone y Gutmann (2014) para obtener soluciones aproximadas del problema de minimizar (o maximizar) funciones de la forma
+		$$C(x) = \sum_a w_a C_a(x)$$
+		donde $x$ es una cadena de $n$ bits, los $w_a$ son números reales y cada $C_a$ es una función booleana 
+		\item El problema Max-Cut es de este tipo, con cada $w_a$ igual a 1 y cada $C_a$ de la forma 
+			$$x_i \oplus x_j$$
+		%\item Los problemas MAX-SAT y  weighted MAX-SAT también responden a esta formulación    
+		 
+		
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{MAX-SAT y weighted MAX-SAT}
+	\begin{itemize}
+		\item El problema MAX-SAT es una generalización del problema de satisfabilidad (SAT)
+		\item Dada una fórmula booleana en forma normal conjuntiva, se trata de determinar el máximo número de cláusulas que pueden ser satisfechas simultáneamente
+		\item Por ejemplo, la fórmula
+		$$ (x_0 \lor x_1) \land (\neg x_0 \lor x_1) \land (x_0 \lor \neg x_1) \land (\neg x_0 \lor \neg x_1)$$
+		no es satisfacible, pero podemos satisfacer tres cláusulas de las cuatro
+		\item Si entendemos cada cláusula como una función que devuelve 0 (falso) o 1 (verdadero), podemos expresar MAX-SAT como maximizar
+		$$C(x) = \sum_a C_a(x)$$
+		con cada $C_a(x)$ una cláusula
+		\item Añadiendo pesos $w_a\geq 0$, tenemos weighted MAX-SAT
+	\end{itemize}
+}     
+	
+
+
+\frame{
+	\frametitle{Funciones booleanas y hamiltonianos}
+	\begin{itemize}
+		\item Para cada función booleana $C_a$ podemos encontrar $H_a$ de la forma 
+		$$a_0 I + \sum_{i} a_i Z_i + \sum_{i<j} a_{ij} Z_iZ_j + \sum_{i<j<k} a_{ijk}Z_iZ_jZ_k + \cdots$$
+		%$$\sum_{S\subseteq\{1,\ldots,n\}} a_S \prod_{j\in S} Z_j$$
+		 
+		%$$ H_a = \sum_b \frac{1}{2} (I - Z_{i_1^b}\cdots Z_{i_{k_b}^b})$$
+		tal que para cada $x$ se verifica que $ C_a(x) = \bra{x}H_a\ket{x}$
+		\item Así, minimizar $C(x)$ es es equivalente a encontrar el estado de mínima energía de 
+		$$ H_f = \sum_a w_a H_a$$
+		ya que $H_f$ es diagonal y $\bra{x}H_f\ket{x} = C(x)$.
+	\end{itemize}
+	%\begin{figure}
+	%\centering
+	%\includegraphics[width=0.9\textwidth]{bool2ham}
+	%\caption{Stuart Hadfield \url{https://arxiv.org/pdf/1804.09130.pdf}}
+	%\end{figure}
+}
+
+\frame{
+	\frametitle{Funciones booleanas y hamiltonianos}
+	\begin{itemize}
+		\item Para pasar una fórmula $C_a$ booleana a hamiltoniano podemos
+		\begin{enumerate}
+			\item Transformar la fórmula para que sólo tenga $\neg$ y $\land$
+			\item Transformar $\neg f$ en $(1-f)$
+			\item Transformar $f \land g$ en $f \cdot g$
+			\item Simplificar potencias de $x_i$ (sabemos que $x_i^2 = x_i$)
+			\item Hacer los cambios $x_i = \frac{1}{2}(I-Z_i)$
+		\end{enumerate} 
+		%\item Por ejemplo, para $$x_0 \oplus x_1$$
+		%se obtiene 
+		%$$ \frac{I}{2} - \frac{Z_0Z_1}{2}$$
+		 \item Podrían aparecer hamiltonianos con términos de grado 3 o superior
+	\end{itemize}
+	\vspace{0.5cm}
+	%\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{bool2ham}
+	%\caption{Stuart Hadfield \url{https://arxiv.org/pdf/1804.09130.pdf}}
+	%\end{figure}
+}
+
+
+
+
+		
+\frame{
+	\frametitle{Los estados parametrizados en el QAOA}	
+	\begin{itemize}	
+		\item QAOA se puede ver como una adaptación de la computación adiabática a los circuitos cuánticos 
+		\item Recordemos que el hamiltoniano adiabático era $$H(t) = (1-\frac{t}{T})H_i +\frac{t}{T}H_f$$ with $H_i = -\sum_{j=1}^n X_j$
+		%\item We would like to implement
+		%$$e^{-i\alpha H(t)}$$
+		\item Como aproximación de la evolución del sistema, consideramos estados parametrizados o variacionales de la forma  
+		$$\ket{\beta,\gamma}=e^{-i\beta_p H_i}e^{-i\gamma_pH_f}\ldots e^{-i\beta_2 H_i}e^{-i\gamma_2H_f}e^{-i\beta_1 H_i}e^{-i\gamma_1 H_f}\ket{s}$$
+		donde $p\geq 1$ y $$\ket{s} = \sum_{i=0}^{2^n-1} \ket{x}$$ 
+	\end{itemize}
+}
+
+
+\frame{
+	\frametitle{Optimización con QAOA}
+	\begin{itemize}
+		\item QAOA es un método híbrido en el que se usan tanto un ordenador clásico como uno cuántico
+		\item Los pasos son: 
+		\begin{enumerate}
+			\item Elegir un valor para $p$ y unos ángulos iniciales $\beta,\gamma$	
+			\item Preparar el estado $\ket{\beta,\gamma}$
+			\item Estimar la energía $E(\beta,\gamma)=\bra{\beta,\gamma}H_f\ket{\beta,\gamma}$ de $\ket{\beta,\gamma}$ 
+			\item Si se cumplen los criterios de parada, terminar. Si no, variar $\beta$ y $\gamma$ para minimizar $E(\beta,\gamma)$  y volver a 2
+		\end{enumerate}
+		\item El paso 2 se realiza en el ordenador cuántico. El resto, en uno clásico.
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Cómo preparar el estado $\ket{\beta,\gamma}$}
+	\begin{itemize}
+		\item El estado $\ket{s}=\sum_{i=0}^{2^n-1} \ket{x}$ se puede preparar con puertas de Hadamard
+		\item Cada $e^{-i\beta_k X_j}$ es una rotación $R_X(2\beta_k)$ o equivalentemente
+		\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\ket{x_j}} & \gate{H} &  \gate{R_Z(2\beta_k)}  & \gate{H} 
+}\]	
+		\item Para implementar $e^{-i\gamma_kH_f}$ sólo necesitamos considerar casos de la forma 
+			$$e^{-i\gamma_k Z_{i_1}\cdots Z_{i_j}}$$
+			porque
+			\begin{itemize}
+				\item Todos los términos de la forma $Z_{i_1}\cdots Z_{i_j}$ conmutan
+				\item Los pesos en $\sum_a w_a H_a$ se ``absorben'' en los ángulos $\gamma$
+			\end{itemize}
+		\end{itemize}
+}
+\frame{
+	\frametitle{Implementando $e^{-i\gamma_k Z_{i_1}\cdots Z_{i_j}}$}
+	\begin{itemize}	
+		\item Nótese que $e^{-i\gamma_k Z_{i_1}\cdots Z_{i_j}}$ es diagonal en la base computacional
+		\item De hecho, para una cadena binaria  $x=x_1\ldots x_n$ su acción en $\ket{x}$ es
+		\begin{itemize}
+			\item $\ket{x} \rightarrow e^{-i\gamma_k}\ket{x}$ if $x_{i_1} \oplus \cdots \oplus x_{i_j} = 0 \mod 2$
+			\item $\ket{x} \rightarrow e^{i\gamma_k}\ket{x}$ if $x_{i_1} \oplus \cdots \oplus x_{i_j} = 1 \mod 2$
+		\end{itemize}	 
+		\item Como se ve, es muy similar a una rotación $R_Z$		 
+		\item Entonces, podemos:
+		\begin{itemize}
+			\item Computar la paridad de $x_{i_1} \oplus \cdots \oplus x_{i_j}$ con puertas CNOT
+			\item Aplicar $R_Z(2\gamma_k)$ en el qubit sobre el que hemos computado la paridad
+			\item Descomputar la paridad
+		\end{itemize}
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Un ejemplo}
+	\begin{itemize}
+		\item Imaginemos que estamos trabajando con 4 qubits y queremos implementar $e^{-i\gamma Z_1 Z_2 Z_4}$
+		\item Podemos usar el siguiente circuito:
+		\[ \Qcircuit @C=1em @R=.7em {
+\lstick{\ket{x_1}}& \ctrl{3} & \qw & \qw  & \qw & \ctrl{3} & \qw \\
+\lstick{\ket{x_2}} & \qw & \ctrl{2} & \qw & \ctrl{2} & \qw & \qw \\
+\lstick{\ket{x_3}} & \qw & \qw & \qw & \qw & \qw & \qw \\
+\lstick{\ket{x_4}} & \targ & \targ & \gate{R_Z(2\gamma)} &\targ & \targ & \qw 
+}
+\]	
+
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Estimando la energía}
+	\begin{itemize}
+		\item Estimar la energía en el QAOA es muy sencillo 
+		\item Repetimos el siguiente proceso un número fijo de veces
+		\begin{enumerate}
+			\item Preparamos el estado $\ket{\beta,\gamma}$
+			\item Lo medimos para obtener un resultado $x$
+			\item Calculamos $C(x)$
+		\end{enumerate}
+		y obtenemos la media de los resultados
+		\item Este proceso funciona porque como $$\ket{\beta,\gamma} = \sum_{x\in\{0,1\}^n} a_x \ket{x}$$ entonces
+		$$\bra{\beta,\gamma}H_f\ket{\beta,\gamma} = \sum_{x\in\{0,1\}^n} |a_x|^2 C(x)$$
+		\item También es interesante guardar la $x$ con el valor de $C(x)$ mínimo entre las que hemos medido
+	\end{itemize}
+}
+
+
+
+
+\frame{
+	\frametitle{Algunos comentarios sobre el QAOA}
+	\begin{itemize}
+		\item Para que el proceso sea eficiente, $H_f$ debe tener un número de términos $e^{-i\gamma_k Z_{i_1}\cdots Z_{i_j}}$ que sea polinomial en el número de qubits $n$ y en el número $m$ de términos $C_a(x)$ de $C(x)$
+		\item Si un término $C_a(x)$ sólo involucra $k$ bits, su traducción $H_a$ involucrará sólo $k$ matrices Pauli $Z_i$  
+		\item Por tanto, si $p$ es constante e indepentiente de $n$ y $m$, y todas los términos involucran a lo sumo $k$ bits (constante también independiente de $n$ y $m$) entonces el número de puertas será polinomial en $n$ y $m$ 
+		\item Es el caso, por ejemplo, de Max-Cut y de Max 3-SAT 		
+		\item Cuando $p \to \infty$, el estado de mínima energía de $\ket{\beta,\gamma}$ tiende al estado de mínima energía de $H_f$
+		\item En algunos casos, se han obtenido resultados interesantes incluso para $p$
+		\item La elección del optimizador clásico también es importante
+	\end{itemize}
+}
+
+
+
+\part{Variational Quantum Eigensolver}
+\frame{\partpage}
+
+\frame{
+	\frametitle{VQE: Variational Quantum Eigensolver}
+	\begin{itemize}
+		\item QAOA puede verse como un caso particular de un algoritmo más general: el Variational Quantum Eigensolver (VQE)
+		\item Ahora, tenemos un hamiltoniano general $H_f$ (con un número polinomial de términos) y queremos aproximar su estado de mínima energía
+		\item En lugar del estado parametrizado $\ket{\beta,\gamma}$ del QAOA usaremos
+		\begin{itemize}
+			\item Un estado inicial $\ket{\psi}$ fácil de preparar (podría ser simplemente $\ket{0}$)
+			\item Una transformación unitaria parametrizada $U(\theta)$ que se suele llamar {\bf forma variacional}
+		\end{itemize}
+		\item Con ellos, creamos un ansatz 
+			$$\ket{\psi(\theta)} = U(\theta)\ket{\psi}$$
+			y tratamos de minimizar su energía con respecto a $H_f$ variando los parámetros
+		\end{itemize}
+}
+
+\frame{
+	\frametitle{El principio variacional}
+	\begin{itemize}
+		\item Como $H_f$ es una matriz hermitiana, tiene autovalores reales $\lambda_i$ y una base asociada de autovectores ortonormales $\ket{\phi_i}$
+		\item Así, podemos escribir $\ket{\psi(\theta)}$ como una combinación lineal 
+			$$   \ket{\psi(\theta)} = \sum_i \alpha_i\ket{\phi_i}$$
+		\item La energía de $\ket{\psi(\theta)}$ es
+			$$ \bra{\psi(\theta)}H_f\ket{\psi(\theta)} = \sum_i |\alpha_i|^2 \lambda_i$$
+		\item Si $\lambda_{min}$ es el menor de esos autovalores, entonces
+			$$ \min_{\theta} \bra{\psi(\theta)}H_f\ket{\psi(\theta)} \geq \lambda_{min} $$
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Aproximando el estado de mínima energía con VQE}
+	\begin{itemize}
+		\item VQE es también un algoritmo híbrido en el que se usa el ordenador cuántico en colaboración con un ordenador clásico
+		\item Los pasos son:
+		\begin{enumerate}
+			\item Elegir un estado inicial $\ket{\psi}$, una forma variacional $U(\theta)$ y un vector de parámetros inicial $\theta$	
+			\item Preparar el estado $\ket{\psi(\theta)}=U(\theta)\ket{\psi}$
+			\item Estimar la energía $E(\theta)=\bra{\psi(\theta)}H_f\ket{\psi(\theta)}$ de $\ket{\psi(\theta)}$ 
+			\item Si se cumplen los criterios de parada, terminar. Si no, variar $\theta$ para minimizar $E(\theta)$ y volver a 2
+		\end{enumerate}
+		\item El paso 2 se realiza en el ordenador cuántico. El resto, en uno clásico.
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Estimando la energía de un estado}
+	\begin{itemize}
+		\item El hamiltoniano siempre puede ser expresado como una combinación lineal de productos tensoriales de Paulis
+		\item Por ejemplo
+			$$ H_f = \frac{1}{4} Z_1Z_3 - 3 X_1Y_3Z_4$$
+		\item Dado $\ket{\psi}$, podemos usar la linearidad y evaluar
+		$$ \bra{\psi}H_f\ket{\psi}=\frac{1}{4} \bra{\psi} Z_1Z_3\ket{\psi} - 3 \bra{\psi}X_1Y_3Z_4\ket{\psi}$$
+		\item Para estimar $\bra{\psi} Z_1Z_3\ket{\psi}$ podemos medir $\ket{\psi}$ en la base computacional y promediar las energías de los resultados (que serán 1 o -1 para cada resultado individual).
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Estimando la energía de un estado (2)}
+	\begin{itemize}
+		\item Para estimar $\bra{\psi} X_1Y_3Z_4\ket{\psi}$ podemos tener en cuenta que 
+		$$ X = HZH$$ and
+		$$ Y = SHZHS^{\dagger}$$
+		\item Entonces $\bra{\psi} X_1Y_3Z_4\ket{\psi}$ es igual
+		$$\bra{\psi}(H\otimes I \otimes SH \otimes I) Z_1Z_3Z_4 (H\otimes I \otimes HS^{\dagger} \otimes I) \ket{\psi} $$
+		\item Por tanto, podemos medir la energía en $Z_1Z_3Z_4$ de $(H\otimes I \otimes HS^{\dagger} \otimes I) \ket{\psi}$ porque 
+		$$\left( (H\otimes I \otimes HS^{\dagger} \otimes I) \ket{\psi}\right)^{\dagger} = \bra{\psi}(H\otimes I \otimes SH \otimes I)$$
+		\item Esto es equivalente a una medida en una base diferente
+		
+	\end{itemize}
+}
+
+
+
+
+\frame{
+	\frametitle{Estudiando moléculas con VQE}
+	\begin{itemize}			
+		 \item VQE ha sido utilizado para estudiar los estados de energía mínima de varias moléculas
+		 \item El hamiltoniano químico (fermiónico) tiene que traducirse en un hamiltoniano de qubits (Jordan-Wigner, Bravyi-Kitaev...)
+		 \item Se usa información del problema para:
+		 \begin{itemize}
+		 	\item El estado inicial (estado del vacío $\ket{0}$, Hartree-Fock...)
+			\item La forma variacional (Unitary Coupled-Cluster Single and Double excitations...)
+		\end{itemize}
+	\end{itemize}
+				\begin{center}
+				\begin{figure}[h!]
+			\includegraphics[width=0.9\textwidth]{vqe}
+			%\caption{Kandala, Mezzacapo, Temme, Takita, Brink, Chow, Gambetta. Nature 549, 242–246 (2017)}
+			\end{figure}
+		\end{center}
+
+}
+
+\frame{
+	\frametitle{Encontrando estados excitados}
+	\begin{itemize}
+		\item También podemos usar VQE para encontrar estados excitados (vectores propios que no son de mínima energía)
+		\item Una vez que tenemos el estado de mínima energía $\ket{\psi_0} = U(\theta_0)\ket{\psi}$, consideramos el hamiltoniano
+		$$ H'_f = H_f + C \ket{\psi_0}\bra{\psi_0} $$
+		\item Así, tenemos que $\bra{\varphi}H'_f\ket{\varphi}$ es
+		$$ \bra{\varphi}H_f\ket{\varphi} + C\bra{\varphi}\ket{\psi_0}\bra{\psi_0}\ket{\varphi}  =  \bra{\varphi}H_f\ket{\varphi} + C|\bra{\psi_0}\ket{\varphi}|^2$$
+		\item Si $C$ es mayor que la diferencia entre la energía mínima y el siguiente nivel de energía de $H_f$, entonces $\ket{\psi_0}$ ya no es estado de mínima energía de $H'_f$
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Calculando productos escalares de estados parametrizados}
+	\begin{itemize}
+	\item Para calcular el producto escalar en la nueva expresión de la energía podemos tener en cuenta que  $\ket{\psi_0} = U(\theta_0)\ket{\psi}$ y que el nuevo estado será de la forma
+	$\ket{\varphi} = U(\theta)\ket{\psi}$
+	para algún $\theta$
+	\item Entonces, es fácil estimar $|\bra{\psi_0}\ket{\varphi}|^2$ ejecutando el circuito de la figura y calculando la frecuencia relativa de $\ket{0}$ porque
+	$$ |\bra{\psi_0}\ket{\varphi}|^2 = |\bra{0}V^\dagger U(\theta_0)^\dagger U(\theta)V\ket{0}|^2$$
+	donde $V$ es una unitaria tal que $V\ket{0} = \ket{\psi}$
+	\end{itemize}
+	\vspace{0.5cm}
+	 \[\Qcircuit @C=1em @R=1em {
+\lstick{\ket{0}}           &  \qw           & \multigate{2}{V}         &  \qw           & \multigate{2}{U(\theta)}    & \qw    & \multigate{2}{U^\dagger(\theta_0)}   &  \qw & \multigate{2}{V^\dagger}          & \qw & \meter \\
+\lstick{\ket{0}}             &  \qw           & \ghost{V}       &  \qw           & \ghost{U(\theta)}      & \qw    & \ghost{U^\dagger(\theta_0)}    & \qw  & \ghost{V^\dagger}       &  \qw & \meter  \\
+\lstick{\ket{0}}   		&  \qw           & \ghost{V}    	&  \qw           & \ghost{U(\theta)}       &  \qw  & \ghost{U^\dagger(\theta_0)}    & \qw & \ghost{V^\dagger}       &  \qw& \meter             }        
+\]
+}
+
+
+\frame{
+	\frametitle{Una aplicación del VQE en física de altas energías} 
+	\begin{itemize}
+		\item Trabajo de Li, Macridin, Spentzouris - Fermilab (2019)
+		\item Hamiltoniano de Rabi: sistema de dos niveles (TLS) acoplado a un modo fotónico
+			$$ H = \omega aa^{\dagger} + \frac{\Omega}{2} Z + g (a^{\dagger} + a)X$$
+		\item Codificación en binario en la base: el modo fotónico se trunca a un máximo de 3 fotones
+			$$ H = \omega Z_0 + \frac{\omega}{2} Z_1 + \frac{\Omega}{2} Z_2 + g \sqrt{Z_0 +2}X_1X_2$$ $$+ \frac{g}{\sqrt{2}}X_0X_1X_2 + Y_0Y_1X_2 + \frac{3\omega}{2}$$
+	\end{itemize}
+	\includegraphics[width=1\textwidth]{boson}
+}
+
+\frame{
+	\frametitle{Resultados en simulación y en ordenadores de Rigetti} 
+	\centering
+	\includegraphics[width=1\textwidth]{resboson}
+}
+
+\frame{
+	\frametitle{Buscando ansatzes adaptados al hardware} 
+\centering
+	\includegraphics[width=1\textwidth]{pulse}
+}
+
+\part{Quantum Machine Learning}
+\frame{\partpage}
+
+\frame{
+	\frametitle{De qué hablamos cuando hablamos de Quantum Machine Learning}
+	\centering
+	\begin{figure}[h!]
+	\includegraphics[width = 0.6\textwidth]{cq}
+	%\caption{Figure taken from {\it Supervised Learning with Quantum Computers}. Schuld, Petruccione (2018)}
+	\end{figure}
+	
+}
+
+\frame{
+	\frametitle{QBLAS: The Quantum Basic Linear Algebra Subroutines}
+	\begin{itemize}
+		\item Varios algoritmos de Quantum Machine Learning (QML) se basan en el speedup exponencial de
+		\begin{itemize}
+			\item La transformada cuántica de Fourier
+			\item La estimación cuántica de fase
+			\item El algoritmo HHL
+		\end{itemize}
+		\item Llamamos a estos métodos Quantum Basic Linear Algebra Subroutines (QBLAS)
+		\item Otras subrutinas usadas en QML incluyen la amplificación de la amplitud y el quantum annealing
+		\item Cargar el {\bf input}, leer el {\bf output}, y el gran tamaño de los circuitos pueden suponer un problema
+	\end{itemize}
+} 
+			
+\frame{
+	\frametitle{QRAM: El elefante en la habitación}
+	\begin{itemize}
+		\item Una Quantum Random Access Memory (QRAM) debería permitir cargar datos en superposición
+		\item Se han propuesto algunas arquitecturas (por ejemplo, la ``bucket brigade'') pero se necesita más investigación
+		\item La carga de datos puede ser un cuello de botella para muchos algoritmos de QML
+	\end{itemize}
+	\centering
+	\includegraphics[width=0.8\textwidth]{qram}
+}		 
+
+\frame{
+	\frametitle{QML transductiva y speedups}
+	\centering
+	\begin{figure}[h!]
+	\includegraphics[width = 0.72\textwidth]{speed}
+	%\caption{Table taken from Biamonte, Wittek, Pancotti, Rebentrost, Wiebe, Lloyd. 
+%Nature 549, 195–202(2017)}
+	\end{figure}
+}
+
+\frame{
+	\frametitle{QML en los tiempos del NISQ}
+	\begin{itemize}
+	\item Los ordenadores de la era NISQ (Noisy Intermediate-Scale Quantum) son
+	\begin{itemize}
+		\item Ruidosos (sin tolerancia a fallos)
+		\item De número limitado de qubits (50-100)
+		\item Sin conexión total entre sus qubits
+	\end{itemize} 
+	\item A pesar de ello, pueden llegar a ser útiles para hacer QML
+	\end{itemize}
+		\centering
+	\includegraphics[width=0.9\textwidth]{nisq}
+
+}
+
+\part{Quantum Support Vector Machines}
+\frame{\partpage}
+
+\frame{
+	\frametitle{Support Vector Machines}
+	\begin{itemize}
+		\item Las Support Vector Machines (SVM) son un algoritmo (clásico) de clasificación muy popular 
+		\item La idea en la que se basan es encontrar un hiperplano separador con el mayor margen posible 
+	\end{itemize}
+	\begin{figure}
+	\centering
+	\includegraphics[width=0.55\textwidth]{svm1}
+	%\caption{wikipedia.org}
+	\end{figure}
+}
+
+\frame{
+	\frametitle{Encontrando el hiperplano}
+	\begin{itemize}
+		\item Tenemos puntos de entranamiento $(x_i, y_i)$ donde los $x_i$ son vectores de números reales y $y_i \in \{1,-1\}$
+		\item El problema de encontrar el hiperplano separador con el mayor margen se puede formular como
+		$$ \hbox{Minimizar } \frac{1}{2}||w||^2 \hbox{  sujeto a  } y_i(w\cdot x_i + b) \geq 1$$
+	\end{itemize}
+	\begin{figure}
+		\centering
+	\includegraphics[width=0.5\textwidth]{svm2}
+	%\caption{John Daniel, towardsdatascience.com}
+	\end{figure}
+}
+
+\frame{
+	\frametitle{El caso del ``margen blando''}
+	\begin{itemize}
+		\item En el caso del  ``margen blando'', introducimos un hiperparámetro $C\geq 0$ y reformulamos el problema como 
+	
+		$$ \hbox{Minimizar } \frac{1}{2}||w||^2 + C \sum_i \xi_i$$ 
+		sujeto a
+		$$ y_i(w\cdot x_i + b) \geq 1 - \xi_i, \hspace{1cm} \xi_i\geq 0$$
+
+	\end{itemize}
+	\begin{figure}
+	\centering
+	\includegraphics[width=0.45\textwidth]{svm3}
+	%\caption{Rishabh Misra, towardsdatascience.com}
+	\end{figure}
+} 
+
+\frame{
+	\frametitle{Formulación dual del SVM}
+	\begin{itemize}
+		\item Una formulación equivalente del problema de optimización del  SVM es esta forma dual
+		 $$ \hbox{Maximizar } \sum_i \alpha_i - \frac{1}{2}\sum_{i,j} y_iy_j\alpha_i\alpha_j \left(x_i\cdot x_j\right)$$ 
+		sujeto a
+		$$0\leq \alpha_i \leq C \hspace{1em} \sum_i \alpha_i y_i = 0$$
+	\item De los valores $\alpha_i$ podemos recuperar $b$ y $w$. De hecho
+	$$w = \sum_i \alpha_i y_i x_i$$
+	y para clasificar un punto $x$ podemos calcular
+	$$ w\cdot x + b =  \sum_i \alpha_i y_i \left(x_i\cdot x\right) + b$$
+	\end{itemize}
+	
+}
+
+\frame{
+	\frametitle{Separación no lineal}
+	\begin{itemize}
+		\item Una técnica muy utilizada para mejorar la clasificación con SVM es trasladar los puntos $x_i$ a un espacio de dimensión superior usando una {\it feature map} $\phi(x_i)$
+	\end{itemize}	
+	\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{kernel}
+	%\caption{C. Moreira, ``Learning To Rank Academic Experts', Master Thesis, Technical University of Lisbon, 2011}
+	\end{figure}
+}
+
+\frame{
+	\frametitle{El truco del kernel}
+	\begin{itemize}
+		\item Podemos incorporar fácilmente la feature map en nuestra formulación dual del SVM
+		 $$ \hbox{Maximizar } \sum_i \alpha_i - \frac{1}{2}\sum_{i,j} y_iy_j\alpha_i\alpha_j \left(\phi(x_i)\cdot \phi(x_j)\right)$$ 
+		sujeto a
+		$$0\leq \alpha_i \leq C \hspace{1em} \sum_i \alpha_i y_i = 0$$
+	\item De nuevo, podemos obtener $w$ como
+	$$w = \sum_i \alpha_i y_i \phi(x_i)$$
+	y para clasificar un punto $x$ sólo necesitamos calcular
+	$$ w\cdot x + b =  \sum_i \alpha_i y_i \left(\phi(x_i)\cdot \phi(x)\right) + b$$
+	\item La función $K(x_i,x_j) = \phi(x_i)\cdot \phi(x_j)$ es llamada kernel
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Calculando kernels con ordenadores cuánticos}
+	\begin{itemize}
+	\item En 2019, Havlíček, Córcoles, Temme et al.\ propusieron la idea de usar ordenadores cuánticos para estimar kernels
+	\item Cada punto $x_i$ se traslada a un espacio de Hilbert con un circuito variacional $U_\phi(x_i)$ such that $U_\phi(x_i)\ket{0}=\ket{\phi(x_i)}$
+	\item Podemos estimar $|\braket{\phi(x_j)}{\phi(x_i)}|^2$ ejecutando el circuito de la figura y calculando la frecuencia relativa de $\ket{0}$ 	
+	\item La resolución del problema de optimización se puede realizar en un ordenador clásico
+\end{itemize}
+	\vspace{1cm}
+	 \[\Qcircuit @C=1em @R=1em {
+\lstick{\ket{0}}                   &  \qw           & \multigate{2}{U_\phi(x_i)}    & \qw    & \multigate{2}{U^\dagger_\phi(x_j)}    & \qw & \meter \\
+\lstick{\ket{0}}                   &  \qw           & \ghost{U_\phi(x_i)}      & \qw    & \ghost{U^\dagger_\phi(x_j)}    & \qw & \meter  \\
+\lstick{\ket{0}}   			&  \qw           & \ghost{U_\phi(x_i)}       &  \qw  & \ghost{U^\dagger_\phi(x_j)}    & \qw & \meter             }        
+\]
+}
+
+\frame{
+	\frametitle{Ejemplos de feature maps}
+	\begin{itemize}
+		\item Codificación en amplitud:
+		\begin{itemize}
+			\item Partimos de un vector de números reales $(x_1, x_2, \ldots, x_m)$ 
+			\item Puede ser necesario normalizarlo y ``rellenarlo'' hasta tamaño $2^n\geq m$
+			\item La codificación se hace mediante un circuito polinomial en $m$  que prepara $\sum_{i =1}^{2^n} x_i \ket{i}$  
+		\end{itemize}
+		\item $Z$-feature map (codificación en ángulo)
+	\end{itemize}
+		\centering
+			\includegraphics[width=0.5\textwidth]{zfm}
+	\begin{itemize}
+	
+		\item $ZZ$-feature map
+	\end{itemize}
+		\centering
+			\includegraphics[width=0.99\textwidth]{zzfm}
+
+}
+
+\frame{
+	\frametitle{Otro ejemplo de feature map}
+	\centering
+			\includegraphics[width=0.99\textwidth]{otrafm}
+
+}
+
+
+%\end{document}
+
+%\frame{
+%	\frametitle{Usando el QSVM en física de altas energías}
+%	\centering
+%	\includegraphics[width=\textwidth]{wu}
+%}
+
+\frame{
+	\frametitle{Un problema de clasificación en física de altas energías} 
+	\begin{itemize}
+		\item Producción del bosón de Higgs
+		\item 67 variables físicas 
+	\end{itemize}
+	\centering
+	\includegraphics[width=0.6\textwidth]{higgs}
+
+
+}
+
+
+\frame{
+	\frametitle{Resultados con métodos de machine learning clásico}
+	\begin{itemize}
+		\item Boosted decision trees (BDT) y deep neural networks (DNN)
+		\item Entrenamiento con las 67 variables y con técnicas de reducción de dimensionalidad (autoencoders)
+		\item Conjuntos de entrenamiento grandes 
+	\end{itemize}
+			\centering
+	\includegraphics[width=0.6\textwidth]{classical}
+}
+
+\frame{
+	\frametitle{Resultados con QSVMs}
+	\begin{itemize}
+		\item 64 variables seleccionadas con AUC
+		\item Forma variacional: amplitude encoding
+	\end{itemize}
+
+		\includegraphics[width = 0.99\textwidth]{best-qsvm}
+}
+
+
+\frame{
+	\frametitle{Más detalles en...}
+	\begin{figure}
+	\centering 
+	\includegraphics[width = 0.9\textwidth]{classifiers}
+	%\caption{Su Yeon Chang, Sofia Vallecorsa (CERN openlab)}
+	\end{figure}
+	
+}
+
+\part{Redes neuronales cuánticas}
+\frame{\partpage}
+
+\frame{
+	\frametitle{¿Qué es una red neuronal cuántica?}
+	\begin{itemize}
+		\item Las redes neuronales cuánticas (QNNs) son circuitos cuánticos parametrizados que se pueden ``entrenar'' con datos y ser utilizadas en tareas de clasificación, regresión...
+		\item La arquitectura más habitual es la que se muestra en la figura: un ``feature map'', que traslada los datos de entrada a un espacio de Hilbert, seguido de una forma variacional con parámetros libres que se entrena 
+	\end{itemize}
+	\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{vqc}
+	%\caption{Vojtech Havlíček et al. \url{https://arxiv.org/pdf/1804.11326.pdf}}
+	\end{figure}
+}	 
+
+\frame{
+	\frametitle{Entrenando y clasificando con una QNN}
+	\begin{itemize}
+	\item Una QNN prepara un estado $\ket{\psi(x,\theta)}$ que depende de los datos de entrada $x$ y de los parámetros $\theta$
+	\item Medimos el estado y estimamos un valor esperado sobre un hamiltoniano, por ejemplo
+		$$ f(x,\theta) = \bra{\psi(x,\theta)}Z_1  \cdots  Z_n \ket{\psi(x,\theta)}$$
+	\item Para cada ejemplo de entrenamiento $x_i$ tenemos una clase $y_i$
+	\item Elegimos una función de pérdida $L$ y buscamos $\theta$ que minimice 
+	$$ \sum_i L(y_i, f(x,\theta))$$ 
+	\item Una vez encontrado $\theta_{min}$ podemos predecir la clase de $x$ usando $f(x,\theta_{min})$
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Gradientes y la regla del desplazamiento de parámetros}
+	\begin{itemize}
+		\item Para obtener $\theta_{min}$, podemos usar un minimizador clásico
+		\item Si necesitamos calcular gradientes de $f$ podemos usar la regla de desplazamiento de parámetros
+		\item Supongamos que $$U(\theta) = e^{-i \theta H}$$ con $H$ una matriz hermitiana de autovalores $\pm r$ ($r$ real) 
+		\item Este es el caso, por ejemplo, si $U$ es una rotación de un qubit 
+		\item Entonces, se verifica que
+		$$\frac{\partial f(x,\theta)}{\partial \theta} =  r  \cdot \left[f(x,\theta + s) - f(x,\theta -s)\right]$$
+		donde $s = \frac{\pi}{4r}$
+		\item Simplemente necesitamos dos evaluaciones adicionales del mismo circuito con un desplazamiento de parámetros
+		  
+	\end{itemize}
+}
+
+
+\frame{
+	\frametitle{Cómo elegir formas variacionales}
+	\begin{figure}[h!]
+	\includegraphics[width = \textwidth]{var}
+	\caption{Sim, Johnson, Aspuru-Guzik. Adv. Quantum Tech. 2(12) (2019)}
+	\end{figure}
+
+}
+
+
+\frame{
+	\frametitle{La capacidad de las redes neuronales cuánticas}
+	\begin{figure}[h!]
+	\includegraphics[width = 1.05\textwidth]{power}
+	\caption{Amira Abbas et al. \url{https://arxiv.org/pdf/2011.00027.pdf}}
+	\end{figure}
+
+}
+
+\frame{
+	\frametitle{El problema de los barren plateaus}
+	\centering
+	\includegraphics[width = 1.05\textwidth]{barren1}
+	\includegraphics[width = 1.05\textwidth]{barren3}
+}
+
+\frame{
+	\frametitle{El problema de los barren plateaus: posibles soluciones}
+	\centering
+	\includegraphics[width = 0.9\textwidth]{barren2}
+	\includegraphics[width = 0.9\textwidth]{barren4}
+}
+
+
+
+
+\frame{
+	\frametitle{Resultados en el problema de clasificación de HEP}
+	\begin{itemize}
+		\item 4 qubits, 8 variables (data-reuploading)
+		\item ZZ feature map
+		\item Forma variacional 2-local 
+	\end{itemize}
+	\centering
+		\includegraphics[width = 0.99\textwidth]{best-vqc}
+}	
+
+\frame{
+	\frametitle{Arquitectura híbrida}
+	\begin{itemize}
+		\item Usamos una red neuronal clásica para reducir la dimensionalidad
+		\item La red neuronal cuántica se usa para clasificar
+		\item Se entrenan conjuntamente
+	\end{itemize}
+		\centering
+		\includegraphics[width = 0.99\textwidth]{hybvqc-architecture}
+}	
+
+\frame{
+	\frametitle{Resultados con la arquitectura híbrida}
+	\begin{itemize}
+		\item 4 qubits, 8 variables (data-reuploading)
+		\item ZZ feature map
+		\item Forma variacional 2-local 
+	\end{itemize}
+	\centering
+		\includegraphics[width = 0.99\textwidth]{best-hybvqc}
+}	
+
+
+\part{Quantum Generative Adversarial Networks}
+\frame{\partpage}
+
+\frame{
+	\frametitle{GANs: Generative Adversarial Networks}
+	\begin{itemize}
+		\item Las Generative Adversarial Networks (GANs) fueron propuestas por Ian Goodfellow y sus colaboradores en 2014
+		\item Su objetivo es is, dado un conjunto de datos, aprender a generar nuevos ejemplos que sigan la misma distribución
+		\item Se han conseguido resultados impresionantes en muchas aplicaciones
+	\end{itemize}
+	\begin{figure}
+	\centering
+	\includegraphics[width = 0.75\textwidth]{gan-faces}
+	%\caption{ Nvidia/StyleGAN \url{https://arxiv.org/abs/1812.04948}}
+	\end{figure}
+}
+
+\frame{
+	\frametitle{Arquitectura de una GAN}
+	\begin{itemize}
+		\item Dos redes neuronales: generador y discriminador
+		\item El generador trata de ``engañar'' al discriminador
+		\item El discriminador intenta distinguir entre datos reales y falsos
+	\end{itemize}
+	\begin{figure}
+	\centering
+	\includegraphics[width = 0.99\textwidth]{gan-arc}
+	%\caption{ Thalles Silva -  www.freecodecamp.org}
+	\end{figure}
+
+}
+
+\frame{
+	\frametitle{Entrenando una GAN}
+	\begin{itemize}
+		\item El generador y el discriminador se entrenan en fases alternas
+		\item El discriminador trata de maximizar 
+		$$ E_x\left[\log{D(x)}\right]  + E_z\left[\log{\left(1-D\left(G(z)\right)\right)}\right] $$
+		\item El generador trata de minimizar 
+		$$ E_z[\log{(1-D(G(z)))}] $$	
+		o (en la práctica) de maximizar 
+		$$ E_z[\log{D(G(z))}] $$
+		
+		
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{GANs cuánticas}
+	\begin{itemize}
+		\item Una GAN cuántica (QGAN) reemplaza el generador o el discriminador (o ambos) por un circuito cuántico
+	\end{itemize}
+	\centering 
+	\includegraphics[width = 0.99\textwidth]{qgan1}
+	\includegraphics[width = 0.99\textwidth]{qgan2}
+}
+
+\frame{
+	\frametitle{Usando QGANs para cargar distribuciones de probabilidad}
+	\centering 
+	\includegraphics[width = 0.99\textwidth]{qgan-ibm}
+}
+
+\frame{
+	\frametitle{El generador cuántico en la QGAN de IBM}
+	\centering 
+	\includegraphics[width = 0.99\textwidth]{qgan-var}
+}
+
+
+\frame{
+	\frametitle{Aplicación de QGANs en HEP: Imágenes de calorímetros}
+	\begin{itemize}
+		\item Proyección bidimensional del depósito de energía tras colisión de partículas
+	\end{itemize}
+	\begin{figure}
+	\centering 
+	\includegraphics[width = 0.99\textwidth]{qgan-calor}
+	%\caption{Su Yeon Chang, Sofia Vallecorsa (CERN openlab)}
+	\end{figure}
+	
+}
+
+
+\frame{
+	\frametitle{El modelo Dual-PQC GAN }
+	
+	\begin{figure}
+	\centering 
+	\includegraphics[width = 0.9\textwidth]{dual-pqc}
+	%\caption{Su Yeon Chang, Sofia Vallecorsa (CERN openlab)}
+	\centering 
+	\includegraphics[width = 0.9\textwidth]{vf-qgan}
+	
+	\end{figure}
+	
+}
+
+
+\frame{
+	\frametitle{Entrenando el modelo}
+	\begin{itemize}
+		\item Simplificación a una dimensión, 4 pixels
+		\item 20,000 imágenes (agrupadas para evaluación)
+		\item $n_1 = n_2 = 4, n = 2$
+		\item Discriminador implementando en PyTorch (4,256,128,1)
+	\end{itemize}
+	
+	\centering 
+	\includegraphics[width = 0.9\textwidth]{cluster-images}
+	%\caption{Su Yeon Chang, Sofia Vallecorsa (CERN openlab)}
+	
+}
+
+\frame{
+	\frametitle{Algunos resultados}
+	\begin{itemize}
+		\item $d_{g,1}=2$
+		\item $d_{g,1}=16$
+	\end{itemize}
+	\begin{figure}
+	\centering 
+	\includegraphics[width = 0.9\textwidth]{qgan-results1}
+	\includegraphics[width = 0.9\textwidth]{qgan-results2}
+	%\caption{Su Yeon Chang, Sofia Vallecorsa (CERN openlab)}
+	\end{figure}
+	
+}
+
+\frame{
+	\frametitle{Más detalles en...}
+	\begin{figure}
+	\centering 
+	\includegraphics[width = 0.9\textwidth]{dual-qgan}
+	%\caption{Su Yeon Chang, Sofia Vallecorsa (CERN openlab)}
+	\end{figure}
+	
+}
+
+\part{Conclusiones}
+\frame{\partpage}
+
+\frame{
+	\frametitle{Conclusiones}
+	\begin{itemize}
+		\item Los ordenadores cuánticos de los que disponemos hoy en día son o de propósito específico (quantum annealers) o NISQ
+		\item Aún así, se están estudiando sus aplicaciones en:
+		\begin{itemize}
+			\item Optimización
+			\item Simulación química y física
+			\item Quantum Machine Learning
+		\end{itemize}
+		\item Las herramientas principales son:
+		\begin{itemize}
+			\item Modelos QUBO/Ising
+			\item Circuitos variacionales
+		\end{itemize}
+		\item Campo fascinante pero aún no entendido por completo
+	\end{itemize}
+}
+
+
+\frame{
+	\frametitle{El futuro está por construir}
+
+		\centering
+	\includegraphics[width=1.01\textwidth]{future}
+
+}
+
+
+
+
+
+
+\end{document}
