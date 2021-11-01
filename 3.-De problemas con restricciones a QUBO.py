@@ -4,6 +4,7 @@
 from dimod import *
 from dwave.system.samplers import DWaveSampler
 from dwave.system.composites import EmbeddingComposite
+import dwave.inspector
 
 # Creamos un Constrained Quadratic Model
 
@@ -95,4 +96,6 @@ print("")
 
 for s in solution.data():
     print(invert(s.sample),qp.objective.energy(s.sample),qp.check_feasible(s.sample), s.num_occurrences)
+    
+dwave.inspector.show(solution)
 
