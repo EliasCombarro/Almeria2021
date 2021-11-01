@@ -1,5 +1,6 @@
 import numpy as np
 import dimod
+import dwave.inspector
 
 # Especificar los coeficientes del problema que queremos resolver es muy fácil
 # Empezaremos con un caso muy sencillo
@@ -89,4 +90,6 @@ response = sampler.sample(model, num_reads=100)
 print("La solucion con el quantum annealer de D-Wave es")
 print(response)
 print()
+
+dwave.inspector.show(response)
 
